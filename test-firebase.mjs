@@ -1,0 +1,33 @@
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, get } from "firebase/database";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAQpPJCr05-I4d5cGa41kr2XWECbatq7Nw",
+  authDomain: "cac-summit.firebaseapp.com",
+  databaseURL: "https://cac-summit-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "cac-summit",
+  storageBucket: "cac-summit.firebasestorage.app",
+  messagingSenderId: "39772577508",
+  appId: "1:39772577508:web:2a655eef52a4a77dff16f1",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+async function test() {
+  try {
+    console.log("Testing write...");
+    await set(ref(db, "test-connection"), { time: Date.now() });
+    console.log("Write successful.");
+    
+    console.log("Testing read...");
+    const snap = await get(ref(db, "test-connection"));
+    console.log("Read successful. Data:", snap.val());
+    process.exit(0);
+  } catch (err) {
+    console.error("Firebase Error:", err);
+    process.exit(1);
+  }
+}
+
+test();

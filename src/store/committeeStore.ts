@@ -1,4 +1,4 @@
-import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { create, type StoreApi, type UseBoundStore, useStore } from "zustand";
 import type {
   CommitteeState,
   Delegation,
@@ -99,6 +99,7 @@ function getFirebasePath(chairId: string) {
 }
 
 function writeToFirebase(chairId: string, state: CommitteeState) {
+  if (chairId === "__default__") return;
   // Debounce writes — 300ms
   if (writeTimer[chairId]) clearTimeout(writeTimer[chairId]);
   writeTimer[chairId] = setTimeout(() => {
@@ -108,7 +109,7 @@ function writeToFirebase(chairId: string, state: CommitteeState) {
       awardOverrides: state.awardOverrides,
       committeeInfo: state.committeeInfo,
     };
-    fbSet(ref(db, getFirebasePath(chairId)), data);
+    fbSet(ref(db, getFirebasePath(chairId)), data).catch(console.error);
   }, 300);
 }
 
@@ -132,6 +133,7 @@ export function getChairCommitteeStore(chairId: string): UseBoundStore<StoreApi<
   if (storeCache[chairId]) return storeCache[chairId];
 
   const store = create<CommitteeState>()((set, get) => ({
+    _isHydrated: false,
     delegations: createInitialDelegations(),
     timeline: [],
     awardOverrides: {},
@@ -510,7 +512,7 @@ export function getChairCommitteeStore(chairId: string): UseBoundStore<StoreApi<
   storeCache[chairId] = store;
 
   // Subscribe to Firebase for real-time sync
-  if (!listeners[chairId]) {
+  if (!listeners[chairId] && chairId !== "__default__") {
     listeners[chairId] = true;
     const dataRef = ref(db, getFirebasePath(chairId));
     onValue(dataRef, (snapshot) => {
@@ -518,10 +520,14 @@ export function getChairCommitteeStore(chairId: string): UseBoundStore<StoreApi<
       if (suppressEcho[chairId]) return;
 
       const data = snapshot.val();
-      if (!data) return; // No data yet in Firebase
+      
+      if (!data) {
+        store.setState({ _isHydrated: true });
+        return; // No data yet in Firebase
+      }
 
       // Merge Firebase data into store — only overwrite data fields, not actions
-      const update: Partial<CommitteeState> = {};
+      const update: Partial<CommitteeState> = { _isHydrated: true };
 
       if (data.delegations) {
         // Ensure all expected delegations exist (Firebase strips empty arrays)
@@ -577,7 +583,7 @@ export function useCommitteeStore<T>(selector: (state: CommitteeState) => T): T 
   const activeChairId = useChairStore((s) => s.activeChairId);
   const chairId = activeChairId || "__default__";
   const store = getChairCommitteeStore(chairId);
-  return store(selector);
+  return useStore(store, selector);
 }
 
 // ─── Undo function (exported separately) ────────────────────────────

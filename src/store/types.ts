@@ -125,8 +125,8 @@ export interface AwardAssignment {
   isOverride: boolean;
 }
 
-// ─── Store ───────────────────────────────────────────────────────────
 export interface CommitteeState {
+  _isHydrated: boolean;
   delegations: Record<string, Delegation>;
   timeline: TimelineEntry[];
   awardOverrides: Record<string, string>; // award → delegation name
