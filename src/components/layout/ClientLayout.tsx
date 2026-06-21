@@ -11,6 +11,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const activeChairId = useChairStore((s) => s.activeChairId);
 
+  // Auth guard: redirect to login if no active chair
+  // This hook MUST be before any conditional returns
+  React.useEffect(() => {
+    if (!activeChairId && pathname !== "/login") {
+      router.push("/login");
+    }
+  }, [activeChairId, pathname, router]);
+
   // If on the login page, render without sidebar
   if (pathname === "/login") {
     return (
@@ -19,13 +27,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       </ToastProvider>
     );
   }
-
-  // Auth guard: redirect to login if no active chair
-  React.useEffect(() => {
-    if (!activeChairId && pathname !== "/login") {
-      router.push("/login");
-    }
-  }, [activeChairId, pathname, router]);
 
   if (!activeChairId) {
     return null; // Avoid flash while redirecting
@@ -45,3 +46,4 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     </ToastProvider>
   );
 }
+
