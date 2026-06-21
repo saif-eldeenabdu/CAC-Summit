@@ -156,7 +156,7 @@ export async function exportPDF(delegations: Record<string, Delegation>) {
       r.leadershipScore,
     ]),
     theme: "grid",
-    headStyles: { fillColor: [245, 158, 11] },
+    headStyles: { fillColor: [192, 192, 192] },
     styles: { fontSize: 9 },
   });
 

@@ -1,10 +1,36 @@
 "use client";
 
 import React from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import { ToastProvider } from "@/components/ui/Toast";
+import { useChairStore } from "@/store/chairStore";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const activeChairId = useChairStore((s) => s.activeChairId);
+
+  // If on the login page, render without sidebar
+  if (pathname === "/login") {
+    return (
+      <ToastProvider>
+        {children}
+      </ToastProvider>
+    );
+  }
+
+  // Auth guard: redirect to login if no active chair
+  React.useEffect(() => {
+    if (!activeChairId && pathname !== "/login") {
+      router.push("/login");
+    }
+  }, [activeChairId, pathname, router]);
+
+  if (!activeChairId) {
+    return null; // Avoid flash while redirecting
+  }
+
   return (
     <ToastProvider>
       <div className="flex min-h-screen">

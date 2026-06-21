@@ -100,6 +100,7 @@ export interface TimelineEntry {
   scoreImpact: number;
   details: string;
   notes: string;
+  chairId: string;
 }
 
 // ─── Scores ──────────────────────────────────────────────────────────
