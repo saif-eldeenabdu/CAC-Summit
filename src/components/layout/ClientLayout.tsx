@@ -4,12 +4,17 @@ import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import { ToastProvider } from "@/components/ui/Toast";
-import { useChairStore } from "@/store/chairStore";
+import { useChairStore, initChairSync } from "@/store/chairStore";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const activeChairId = useChairStore((s) => s.activeChairId);
+
+  // Init Firebase listeners for chairs
+  React.useEffect(() => {
+    initChairSync();
+  }, []);
 
   // Auth guard: redirect to login if no active chair
   // This hook MUST be before any conditional returns

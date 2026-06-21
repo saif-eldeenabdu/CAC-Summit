@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useChairStore } from "@/store/chairStore";
-import { migrateOldStore } from "@/store/committeeStore";
 import { useRouter } from "next/navigation";
 import { UserPlus, LogIn, Users, Trash2 } from "lucide-react";
 
@@ -16,10 +15,6 @@ export default function LoginPage() {
   const [newName, setNewName] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
-  // Run migration on first render
-  React.useEffect(() => {
-    migrateOldStore();
-  }, []);
 
   const handleCreate = () => {
     const trimmed = newName.trim();
@@ -152,7 +147,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-xs text-muted/60">
-          Each chair maintains independent scores · Data is stored locally
+          Each chair maintains independent scores · Data is synced across all devices in real-time
         </p>
       </div>
     </div>
