@@ -3,7 +3,7 @@ export const DELEGATIONS = [
   "Suge Knight",
   "David Kenner",
   "Snoop Dogg",
-  "Dr. Dre",
+  "Dr Dre",
   "Ice Cube",
   "Kurupt",
   "Treach",

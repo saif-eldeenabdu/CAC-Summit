@@ -10,6 +10,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const router = useRouter();
   const activeChairId = useChairStore((s) => s.activeChairId);
+  const _initialized = useChairStore((s) => s._initialized);
 
   // Init Firebase listeners for chairs
   React.useEffect(() => {
@@ -19,10 +20,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // Auth guard: redirect to login if no active chair
   // This hook MUST be before any conditional returns
   React.useEffect(() => {
-    if (!activeChairId && pathname !== "/login") {
+    if (_initialized && !activeChairId && pathname !== "/login") {
       router.push("/login");
     }
-  }, [activeChairId, pathname, router]);
+  }, [activeChairId, _initialized, pathname, router]);
 
   // If on the login page, render without sidebar
   if (pathname === "/login") {
